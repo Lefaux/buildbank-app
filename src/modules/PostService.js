@@ -6,7 +6,7 @@ module.exports = {
 
         const options = {
             method: "POST",
-            url: "https://something.whatever/upload",
+            url: "https://www.molten-core-salvage-ops.com/upload",
             port: 443,
             headers: {
                 "Authorization": "Basic " + auth,
