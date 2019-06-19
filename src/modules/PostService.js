@@ -2,17 +2,24 @@ module.exports = {
     post: function (file) {
         const request = require('request');
         const fs = require('fs');
-        const url = 'https://example.dev/upload';
+        const auth = Buffer.from('someApiToken').toString('base64');
 
-        let req = request.post(url, function (err, resp, body) {
-            if (err) {
-                console.log('Error!');
-            } else {
-                console.log('URL: ' + body);
+        const options = {
+            method: "POST",
+            url: "https://something.whatever/upload",
+            port: 443,
+            headers: {
+                "Authorization": "Basic " + auth,
+                "Content-Type": "multipart/form-data"
+            },
+            formData: {
+                "file": fs.createReadStream(file)
             }
+        };
+
+        request(options, function (err, res, body) {
+            if (err) console.log(err);
+            console.log(body);
         });
-        let form = req.form();
-        form.append('file', fs.createReadStream(file));
-        console.log('File posted');
     }
 };
