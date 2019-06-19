@@ -22,11 +22,9 @@ chooseBtn.addEventListener('click', function(event) {
             title: 'Select a folder',
             properties: ["openDirectory"]
         }, (folderPath) => {
-            placeHolder.setAttribute('placeholder', folderPath);
-            console.log(folderPath);
+            placeHolder.value = folderPath;
             storage.set('folderPath', { folder: folderPath }, function(error) {
                 if (error) throw error;
-                console.log("stored");
             });
         }
     );
