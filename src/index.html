@@ -6,13 +6,17 @@
     <link rel="stylesheet" href="../assets/css/main.css">
   </head>
   <body>
-    <h1>Hello Sweet</h1>
-    <p>You need to select the folder to the Guildbank.lua file.</p>
-    <p>It should be in [Your WoW Folder]]\WTF\Account\Moltvault\SavedVariables</p>
-    <p>
-        <input type="text" placeholder="Please select the folder" id="wow-folder" disabled="disabled"/>
-        <input type="button" value="Choose folder" id="select-folder"/>
-    </p>
+    <div class="docs">
+        <h1>Molten Core Salvage Ops Bank Updater</h1>
+        <h4>Hello Sweet,</h4>
+        <p>please select the folder to the <code>Guildbank.lua</code> file.</p>
+        <p>It is in <code>[Your WoW Folder]]\WTF\Account\Moltvault\SavedVariables</code>.</p>
+        <p>As long as this app is open it will detect updates on its own.</p>
+    </div>
+    <div class="settings">
+      <div class="path"><input type="text" placeholder="Please select the folder" id="wow-folder" disabled="disabled"/></div>
+      <div class="selector-button"><input type="button" value="Set Folder" id="select-folder"/></div>
+    </div>
     <script src="index.js"></script>
   </body>
 </html>

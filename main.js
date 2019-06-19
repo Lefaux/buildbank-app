@@ -24,7 +24,7 @@ function createWindow() {
 
     // and load the index.html of the app.
     mainWindow.loadFile('src/index.html');
-    mainWindow.webContents.openDevTools();
+    //mainWindow.webContents.openDevTools();
 
     // Open the DevTools.
     // mainWindow.webContents.openDevTools()
@@ -36,30 +36,6 @@ function createWindow() {
         // when you should delete the corresponding element.
         mainWindow = null
     });
-
-    var menu = Menu.buildFromTemplate([
-        {
-            label: 'Menu',
-            submenu: [
-                {
-                    label: 'Set path to WoW Folder',
-                    click() {
-                        shell.openExternal('https://typo3.com')
-                    }
-                },
-                {
-                    type: 'separator'
-                },
-                {
-                    label: 'Exit',
-                    click() {
-                        app.quit()
-                    }
-                }
-            ]
-        }
-    ]);
-    Menu.setApplicationMenu(menu);
 }
 
 // This method will be called when Electron has finished
