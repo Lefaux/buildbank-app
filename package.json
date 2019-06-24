@@ -2,6 +2,7 @@
   "name": "guildbank-uploader",
   "version": "1.0.0",
   "description": "Uploading Helper for Guildbank",
+  "productName": "MCSO Bank Uploader",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -10,7 +11,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^5.0.4"
+    "electron": "^5.0.4",
+    "electron-packager": "^13.1.1"
   },
   "dependencies": {
     "electron-json-storage": "^4.1.6",
