@@ -15,9 +15,9 @@ storage.get('folderPath', function (error, data) {
 
     if (undefined !== data['folder'] && null !== data['folder']) {
         placeHolder.value = data['folder'];
+        checkRootPath(data['folder']);
     }
 });
-buildCheckBoxes();
 
 chooseBtn.addEventListener('click', function (event) {
     remote.dialog.showOpenDialog(
@@ -31,10 +31,7 @@ chooseBtn.addEventListener('click', function (event) {
             placeHolder.value = folderPath;
             storage.set('folderPath', {folder: folderPath}, function (error) {
                 if (error) throw error;
-                storage.set('accountFolders', {folders: getDirectories(folderPath)}, function (error) {
-                    if (error) throw error;
-                    buildCheckBoxes();
-                });
+                checkRootPath(folderPath);
             });
         }
     );
@@ -90,5 +87,12 @@ function buildCheckBoxes() {
                 });
             }
         });
+    });
+}
+
+function checkRootPath(folderPath) {
+    storage.set('accountFolders', {folders: getDirectories(folderPath)}, function (error) {
+        if (error) throw error;
+        buildCheckBoxes();
     });
 }
