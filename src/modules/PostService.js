@@ -17,9 +17,12 @@ module.exports = {
             }
         };
 
+        console.log('Starting upload for ' + file);
+
         request(options, function (err, res, body) {
-            if (err) console.log(err);
-            console.log(body);
+            if (err) return;
+
+            console.log('Uploaded ' + file);
         });
     }
 };

@@ -2,11 +2,8 @@
 const {app, BrowserWindow, Menu} = require('electron');
 const path = require('path');
 const shell = require('electron').shell;
-const fs = require('fs');
-const md5 = require('md5');
 const storage = require('electron-json-storage');
-const postService = require('./src/modules/PostService');
-const fileToWatch = 'GuildBankManager.lua';
+const watcher = require('./src/modules/FileWatchService');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -56,8 +53,6 @@ app.on('activate', function () {
     if (mainWindow === null) createWindow()
 });
 
-let md5Previous = null;
-let fsWait = false;
 storage.get('folderPath', function (error, data) {
     if (error) return;
 
@@ -65,21 +60,14 @@ storage.get('folderPath', function (error, data) {
         return;
     }
 
-    let fullPath = data['folder'] + '/' + fileToWatch;
-
-    fs.watch(fullPath, (event, filename) => {
-        if (filename) {
-            if (fsWait) return;
-            fsWait = setTimeout(() => {
-                fsWait = false;
-            }, 100);
-            const md5Current = md5(fs.readFileSync(fullPath));
-            if (md5Current === md5Previous) {
-                return;
-            }
-            md5Previous = md5Current;
-            postService.post(fullPath)
-            console.log(`${filename} file Changed`);
+    storage.get('accountFolders', function (error, storageFolders) {
+        if (undefined === storageFolders['folders'] || null === storageFolders['folders']) {
+            return;
         }
+
+        for (let i = 0; i < storageFolders['folders'].length; i++) {
+            watcher.watch(data['folder'] + '/WTF/Account/' + storageFolders['folders'][i] + '/SavedVariables');
+        }
+
     });
 });
