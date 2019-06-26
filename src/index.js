@@ -4,6 +4,7 @@ const storage = require('electron-json-storage');
 const BrowserWindow = electron.remote.BrowserWindow;
 const remote = electron.remote;
 const fs = require('fs');
+const JSON5 = require('json5');
 
 const chooseBtn = document.getElementById('select-folder');
 const placeHolder = document.getElementById('wow-folder');
@@ -43,48 +44,18 @@ function getDirectories(storagePath) {
     });
 }
 
-function buildCheckBoxes() {
+function buildCheckBoxes(rootFolder) {
     storage.get('accountFolders', function (error, storageFolders) {
         if (undefined === storageFolders['folders'] || null === storageFolders['folders']) {
             return;
         }
 
-        storage.get('allowedAccounts', function (error, accounts) {
+        storage.get('allowedAccounts', async function (error, accounts) {
             if (undefined === accounts['accounts']) {
                 accounts['accounts'] = [];
             }
             for (let i = 0; i < storageFolders['folders'].length; i++) {
-                var checkbox = document.createElement('input');
-                checkbox.type = "checkbox";
-                checkbox.name = storageFolders['folders'][i];
-                checkbox.value = "value";
-                checkbox.id = storageFolders['folders'][i];
-                if (accounts['accounts'].includes(storageFolders['folders'][i])) {
-                    checkbox.checked = true;
-                }
-
-                var label = document.createElement('label');
-                label.htmlFor = storageFolders['folders'][i];
-                label.appendChild(document.createTextNode(storageFolders['folders'][i]));
-
-                container.appendChild(checkbox);
-                container.appendChild(label);
-                container.appendChild(document.createElement('br'));
-
-                document.getElementById(storageFolders['folders'][i]).addEventListener('change', function () {
-                    if (document.getElementById(storageFolders['folders'][i]).checked) {
-                        if (!accounts['accounts'].includes(storageFolders['folders'][i])) {
-                            accounts['accounts'].push(storageFolders['folders'][i]);
-                        }
-                    } else {
-                        for (var j = 0; j < accounts['accounts'].length; j++) {
-                            if (accounts['accounts'][j] === storageFolders['folders'][i]) {
-                                accounts['accounts'].splice(j, 1);
-                            }
-                        }
-                    }
-                    storage.set('allowedAccounts', {accounts: accounts['accounts']}, null);
-                });
+                buildCharacterCheckBoxes(storageFolders['folders'][i], rootFolder);
             }
         });
     });
@@ -93,6 +64,85 @@ function buildCheckBoxes() {
 function checkRootPath(folderPath) {
     storage.set('accountFolders', {folders: getDirectories(folderPath)}, function (error) {
         if (error) throw error;
-        buildCheckBoxes();
+        buildCheckBoxes(folderPath);
+    });
+}
+
+function readLua(filePath, cb) {
+    var str = '';
+    fs.readFile(filePath, 'utf8', function (err, data) {
+        if (err) data = '';
+        cb(data);
+    });
+}
+
+function buildCharacterCheckBoxes(account, storagePath) {
+    let fullPath = storagePath + '/WTF/Account/' + account + '/SavedVariables/GuildBankManager.lua';
+
+    readLua(fullPath, function (data) {
+
+        data = data.replace(/\["/g, '"')
+            .replace(/"\]/g, '"')
+            .replace(/\[/g, '"')
+            .replace(/\]/g, '"')
+            .replace(/,}/g, '}')
+            .replace(/=/g, ':')
+            .replace('gbm_excepts', '"gbm_excepts"')
+            .replace('gbm_bank', '"gbm_bank"')
+            .replace('gbm_guildmembers', '"gbm_guildmembers"')
+            .replace(/}/g, '},')
+            .replace(/,,/g, ',')
+            .replace(/: nil/g, ': null,');
+
+        data = '{' + data + '}';
+
+        const json = JSON5.parse(data);
+
+        let header = document.createElement('h3');
+        let t = document.createTextNode(account);
+        header.appendChild(t);
+        container.append(header);
+
+
+        for (let propertyName in json['gbm_bank']) {
+            console.log(propertyName);
+
+            storage.get('allowedCharacters', async function (error, characters) {
+                if (undefined === characters['characters']) {
+                    characters['characters'] = [];
+                }
+                var checkbox = document.createElement('input');
+                checkbox.type = "checkbox";
+                checkbox.name = propertyName;
+                checkbox.value = "value";
+                checkbox.id = propertyName;
+                if (characters['characters'].includes(propertyName)) {
+                    checkbox.checked = true;
+                }
+
+                var label = document.createElement('label');
+                label.htmlFor = propertyName;
+                label.appendChild(document.createTextNode(propertyName));
+
+                container.appendChild(checkbox);
+                container.appendChild(label);
+                container.appendChild(document.createElement('br'));
+
+                document.getElementById(propertyName).addEventListener('change', function () {
+                    if (document.getElementById(propertyName).checked) {
+                        if (!characters['characters'].includes(propertyName)) {
+                            characters['characters'].push(propertyName);
+                        }
+                    } else {
+                        for (var j = 0; j < characters['characters'].length; j++) {
+                            if (characters['characters'][j] === propertyName) {
+                                characters['characters'].splice(j, 1);
+                            }
+                        }
+                    }
+                    storage.set('allowedCharacters', {characters: characters['characters']}, null);
+                });
+            });
+        }
     });
 }
